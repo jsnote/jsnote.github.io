@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title id="title"></title>
+    <style>
+        /* CSS 스타일을 사용하여 버튼 크기를 조정 */
+        button {
+            width: 200px; /* 원하는 너비로 조정 */
+            height: 50px; /* 원하는 높이로 조정 */
+            font-size: 18px; /* 원하는 글꼴 크기로 조정 */
+        }
+        /* 비디오 크기 조정 */
+        video {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border: 1px solid black;
+        }
+    </style>
+  </head>
+  <body>
+    <h1 id="subject">미디어부 개발2팀 앱 WebGL 전환 테스트(http)</h1>
+
+    <h2>[밀크T초등] 칠교놀이(오늘의 학습) * 2021.3.11f</h2>
+    <button onclick="openLinkApp('sevenpieces', 'T0WE90U32001')">1차시</button>
+    <button onclick="openLinkApp('sevenpieces', 'T0WE90U32002')">2차시</button>
+
+    <h2>[밀크T초등] 무엇이 똑같을까 * 2021.3.11f</h2>
+    <button onclick="openLinkApp('samething_tobe4','')">OPEN</button>
+    <button onclick="openNativeApp()">안드로이드앱</button>
+
+    <h2>웹캠 테스트 * 6000.0.0f1</h2>
+    <button onclick="openLinkApp('test_webcam','')">OPEN</button>
+    <button onclick="webCamTest()">Javascript</button>
+    <video id="videoElement" autoplay playsinline></video>
+    <p id="errorMessage" style="color: red;"></p>
+
+    <h2>마이크 접근 요청 테스트(자바스크립트)</h2>
+    <button id="requestMicBtn">마이크 접근 요청하기</button>
+    <div class="status" id="status">마이크 접근 상태: 대기 중...</div>
+
+    <h2>[밀크T초등] 지오그래픽 * 6000.0.0f1</h2>
+    <button onclick="openLinkApp('TapTapGeographic_New_noMicrophone','')">OPEN(마이크기능 X)</button>
+    <button onclick="openLinkApp('TapTapGeographic_New','')">OPEN</button>
+
+   <script>
+
+        var strProtocol = "";
+        var strIp = "";
+        window.onload = function() {
+            // 현재 URL을 가져오기
+            const url = window.location.href;
+
+            // URL에 따라 다른 콘텐츠를 표시
+            if (url.includes("https")) {
+                document.getElementById("title").innerHTML = "밀크T런처 WebSSL";
+                document.getElementById("subject").innerHTML = "미디어부 개발2팀 앱 WebGL 전환 테스트(https)+Access-Control-Allow-Origin";
+                strProtocol = "https://";
+                strIp = "10.22.118.33:8000/";
+            } else {
+                document.getElementById("title").innerHTML = "밀크T런처 Web";
+                document.getElementById("subject").innerHTML = "미디어부 개발2팀 앱 WebGL 전환 테스트(http)";
+                strProtocol = "http://";
+                strIp = "10.22.118.33:8080/";
+            }
+        };
+
+        function openNativeApp() {
+            // 앱이 설치되어 있을 경우에는 이 링크를 통해 앱이 실행됩니다.
+            window.location.href = 'milkt://samething';
+        }
+
+        function openLinkApp(appName, mCode) {
+            const serverUrl = `${strProtocol}${strIp}UnityWebGL/`;
+            const defaultParams = `serverUrl=${strProtocol}test-app.milkt.co.kr&userId=mdtest1`;
+            let filePath = "";
+            let link = "";
+
+            switch (appName) {
+                case "sevenpieces":
+                    filePath = strProtocol.includes("https")
+                        ? "pd.onetimetest.gscdn.com:8080/onetime/milkT/app/Tests/2020/SppTangram"
+                        : `${strProtocol}${strIp}FileServer/SppTangram`;
+
+                    link = `${serverUrl}${appName}/index.html?${defaultParams}&filePath=${filePath}&mCode=${mCode}&lecType=T_TANGRAM`;
+                    break;
+
+                case "samething_tobe4":
+                    link = `${serverUrl}${appName}/index.html`;
+                    break;
+
+                case "test_webcam":
+                    link = `${serverUrl}${appName}/index.html`;
+                    break;
+
+                case "TapTapGeographic_New_noMicrophone":
+                case "TapTapGeographic_New":
+                    filePath = `${strProtocol}${strIp}FileServer/GEOGRAPHIC/`;
+                    link = `${serverUrl}${appName}/index.html?${defaultParams}&usergrade=&usertype=E&userKey=b9da8163-60d8-4017-9617-2fb255e0f7cf&filePath=${filePath}`;
+                    break;
+
+                default:
+                    console.error(`Unknown appName: ${appName}`);
+                    return;
+            }
+
+            window.open(link, "_blank");
+        }
+
+      document.getElementById('requestMicBtn').addEventListener('click', function() {
+        // 마이크 접근 요청
+        navigator.mediaDevices.getUserMedia({ audio: true })
+          .then(function(stream) {
+            // 마이크에 접근 성공
+            document.getElementById('status').textContent = '마이크 접근 상태: 성공';
+            console.log('마이크에 접근 성공:', stream);
+          })
+          .catch(function(err) {
+            // 마이크 접근 실패
+            document.getElementById('status').textContent = '마이크 접근 상태: 실패 (' + err.message + ')';
+            console.error('마이크 접근 실패:', err);
+          });
+      });
+
+      function webCamTest() {
+        const videoElement = document.getElementById('videoElement');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // 웹캠에 접근 요청
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then(function(stream) {
+            // 웹캠 스트림을 video 요소에 설정
+            videoElement.srcObject = stream;
+            errorMessage.textContent = ''; // 에러 메시지 초기화
+          })
+          .catch(function(error) {
+            // 웹캠 접근 실패 처리
+            console.error('Webcam access failed:', error);
+            errorMessage.textContent = '웹캠 접근 실패: ' + error.message;
+          });
+      }
+    </script>
+  </body>
+</html>
